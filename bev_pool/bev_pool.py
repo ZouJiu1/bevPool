@@ -147,7 +147,7 @@ class QuickCumsumMean(torch.autograd.Function):
 
         # save kept for backward
         ctx.save_for_backward(kept)
-        ctx.save_for_backward(interval_lengths)
+        ctx.other = interval_lengths
 
         # no gradient for geom_feats
         ctx.mark_non_differentiable(geom_feats)
@@ -156,7 +156,8 @@ class QuickCumsumMean(torch.autograd.Function):
 
     @staticmethod
     def backward(ctx, gradx, gradgeom):
-        (kept, interval_lengths) = ctx.saved_tensors
+        kept = ctx.saved_tensors
+        interval_lengths = ctx.other
         back = torch.cumsum(kept, 0)
         back[kept] -= 1
 
